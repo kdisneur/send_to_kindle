@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+$:.push File.expand_path('../../lib', __FILE__)
+
+require 'daemons'
+require 'send_to_kindle'
+require 'thor'
+require 'yaml'
+
+class SendToKindleDaemon < Thor
+
+  desc 'daemonize', 'Run daemon to send document to kindle'
+  method_option :configuration, type: :string,  required: true
+  def daemonize
+    configuration_path = options[:configuration]
+
+    unless configuration_path && File.exists?(configuration_path)
+      puts %{configuration path does not exist: "#{configuration_path}"}
+      exit 1
+    end
+
+    configuration      = YAML.load_file(configuration_path)
+
+    Daemons.daemonize
+    SendTokindle.listen(configuration)
+  end
+end
+
+SendToKindleDaemon.start
