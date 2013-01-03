@@ -7,7 +7,7 @@ module SendTokindle
   def self.default_options
     {
       paths:         nil,
-      file_types:    /\.pdf$/,
+      file_types:    '\.pdf$',
       notifications: {
         mediums: {
           kindle:                  true,
@@ -38,7 +38,7 @@ module SendTokindle
     end
 
     Listen.to(options[:paths])
-          .filter(options[:file_types])
+          .filter(Regexp.new(options[:file_types]))
           .latency(0.5)
           .force_polling(true)
           .change(&callback)
